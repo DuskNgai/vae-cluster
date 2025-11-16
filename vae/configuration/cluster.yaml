@@ -1,0 +1,70 @@
+_BASE_:
+  - ../../coach_pl/configuration/base.yaml
+  - model/cnn.yaml
+
+CRITERION:
+  NAME: ClusteringCriterion
+
+  WEIGHT: 0.2
+
+DATAMODULE:
+  DATALOADER:
+    PIN_MEMORY: True
+    DROP_LAST: False
+    PERSISTENT_WORKERS: True
+
+    TRAIN:
+      BATCH_SIZE: 500
+      NUM_WORKERS: 4
+
+  DATASET:
+    NAME: MNISTDataset
+    ROOT: null
+
+EVALUATOR:
+  NAME: ClusteringEvaluator
+
+MODULE:
+  NAME: SelfSupervisedClusteringModule
+  COMPILE: True
+
+  OPTIMIZER:
+    NAME: Adam
+    BASE_LR: 1.0e-3
+    PARAMS:
+      WEIGHT_DECAY: 0.0
+      BETAS: [0.9, 0.999]
+      EPS: 1.0e-8
+
+  SCHEDULER:
+    NAME: cosine
+    STEP_ON_EPOCHS: False
+    PARAMS:
+      WARMUP_LR: 1.0e-6
+      WARMUP_EPOCHS: 10
+
+TRAINER:
+  STRATEGY: auto        # Set to `auto`, `ddp`, `deepspeed_stage_2`, `deepspeed_stage_3` ...
+  PRECISION: 16-mixed
+  CHECKPOINT:
+    EVERY_N_EPOCHS: 10  # Each time before a checkpoint is saved, the model will be evaluated on the validation set
+
+    SAVE_BEST: False    # If True, monitor will be required
+    MONITOR: null
+
+  MAX_EPOCHS: 200       # If profiler is enabled, this will be *automatically* set to 1
+  LOG_EVERY_N_STEPS: 20
+  ACCUMULATE_GRAD_BATCHES: 1
+
+  CLIP_GRAD:
+    ALGORITHM: null
+    VALUE: null
+
+  DETERMINISTIC: True   # Set to True to enable cudnn.deterministic
+  BENCHMARK: False      # Set to True to enable cudnn.benchmark
+  PROFILER: null        # Set to `simple` or `advanced` or `pytorch` to enable profiling
+  DETECT_ANOMALY: False # Set to True to enable anomaly detection
+  SYNC_BATCHNORM: False # Set to True to enable sync batchnorm
+
+SEED: 0
+OUTPUT_DIR: null

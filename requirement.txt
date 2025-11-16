@@ -1,0 +1,17 @@
+fvcore
+h5py
+ipykernel
+jupyterlab
+lightning
+matplotlib
+numpy
+omegaconf
+pandas
+pre-commit
+rich
+scikit-learn
+scipy
+seaborn
+tensorboard
+timm
+umap-learn
