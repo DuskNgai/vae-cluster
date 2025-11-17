@@ -1,0 +1,7 @@
+_BASE_:
+  - other.yaml
+  - model/table.yaml
+
+MODULE:
+  OPTIMIZER:
+    BASE_LR: 2.0e-3

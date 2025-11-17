@@ -18,13 +18,17 @@ class CNNEncoder(nn.Module):
 
         self.net = nn.Sequential(
             nn.Conv2d(1, num_filters, 3, 2, 1),                                # [B, C, 14, 14]
-            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.BatchNorm2d(num_filters),
+            nn.ReLU(inplace=True),
             nn.Conv2d(num_filters, num_filters * 2, 3, 1, 1),                  # [B, C * 2, 14, 14]
-            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.BatchNorm2d(num_filters * 2),
+            nn.ReLU(inplace=True),
             nn.Conv2d(num_filters * 2, num_filters * 4, 3, 2, 1),              # [B, C * 4, 7, 7]
-            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.BatchNorm2d(num_filters * 4),
+            nn.ReLU(inplace=True),
             nn.Conv2d(num_filters * 4, num_filters * 8, 3, 1, 1),              # [B, C * 8, 7, 7]
-            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            nn.BatchNorm2d(num_filters * 8),
+            nn.ReLU(inplace=True),
             nn.Flatten(),
             nn.Linear(num_filters * 8 * (img_size // 4) ** 2, latent_dim * 2),
         )

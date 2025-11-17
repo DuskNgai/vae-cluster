@@ -45,28 +45,32 @@ class ClusteringEvaluator:
         self.result["label"].append(label.cpu().numpy())
         self.result["prediction"].append(result["prediction"].cpu().numpy())
         self.result["latent"].append(result["latent"].cpu().numpy())
+        self.result["posterior_mean"].append(result["posterior_mean"].cpu().numpy())
 
     def __call__(self) -> None:
         labels = np.concatenate(self.result["label"])
         predictions = np.concatenate(self.result["prediction"])
         latents = np.concatenate(self.result["latent"])
+        posterior_means = np.concatenate(self.result["posterior_mean"])
 
         # Find best permutation & accuracy
         cm = confusion_matrix(labels, predictions)
         row_ind, col_ind = linear_sum_assignment(cm, maximize=True)
         accuracy = cm[row_ind, col_ind].sum() / cm.sum()
-        mapping = {
-            original: new
-            for original, new in zip(col_ind, row_ind)
-        }
-        mapped_predictions = np.array([mapping[p] for p in predictions])
+
+        max_pred = np.max(predictions)
+        mapping_array = np.zeros(max_pred + 1, dtype=int)
+        mapping_array[col_ind] = row_ind
+        mapped_predictions = mapping_array[predictions]
 
         self.result = defaultdict(list)
 
         return {
             "metric/accuracy": accuracy,
-            "pca_image": self.pca_plot(labels, latents, mapped_predictions),
-            "umap_image": self.umap_plot(labels, latents, mapped_predictions),
+            "latent_pca_image": self.pca_plot(labels, latents, mapped_predictions),
+            "latent_umap_image": self.umap_plot(labels, latents, mapped_predictions),
+            "posterior_pca_image": self.pca_plot(labels, posterior_means, mapped_predictions),
+            "posterior_umap_image": self.umap_plot(labels, posterior_means, mapped_predictions),
         }
 
     def pca_plot(self, labels: np.ndarray, latents: np.ndarray, mapped_predictions: np.ndarray) -> torch.Tensor:

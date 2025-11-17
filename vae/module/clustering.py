@@ -151,8 +151,10 @@ class SelfSupervisedClusteringModule(LightningModule):
             if "image" not in k
         }, sync_dist=False, rank_zero_only=True)
 
-        self.logger.experiment.add_images("val/pca_space", metric["pca_image"], self.current_epoch)
-        self.logger.experiment.add_images("val/umap_space", metric["umap_image"], self.current_epoch)
+        self.logger.experiment.add_images("val/latent_pca_space", metric["latent_pca_image"], self.current_epoch)
+        self.logger.experiment.add_images("val/latent_umap_space", metric["latent_umap_image"], self.current_epoch)
+        self.logger.experiment.add_images("val/posterior_pca_space", metric["posterior_pca_image"], self.current_epoch)
+        self.logger.experiment.add_images("val/posterior_umap_space", metric["posterior_umap_image"], self.current_epoch)
 
     def test_step(self, batch: Any, batch_idx: int) -> None:
         image, label, index = batch
@@ -177,10 +179,12 @@ class SelfSupervisedClusteringModule(LightningModule):
         output_dir = Path(self.trainer.default_root_dir) / "results"
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        Image.fromarray(metric["pca_image"][0].transpose(1, 2, 0)).save(output_dir / "pca.png")
-        Image.fromarray(metric["umap_image"][0].transpose(1, 2, 0)).save(output_dir / "umap.png")
+        Image.fromarray(metric["latent_pca_image"][0].transpose(1, 2, 0)).save(output_dir / "latent_pca.png")
+        Image.fromarray(metric["latent_umap_image"][0].transpose(1, 2, 0)).save(output_dir / "latent_umap.png")
+        Image.fromarray(metric["posterior_pca_image"][0].transpose(1, 2, 0)).save(output_dir / "posterior_pca.png")
+        Image.fromarray(metric["posterior_umap_image"][0].transpose(1, 2, 0)).save(output_dir / "posterior_umap.png")
 
-        for category in range(10):
+        for category in range(self.model.classifier.num_classes):
             sample_path = output_dir / f"category_{category}.png"
             sample_image = self.random_sample(category)
             Image.fromarray(sample_image).save(sample_path)

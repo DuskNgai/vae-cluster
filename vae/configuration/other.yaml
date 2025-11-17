@@ -1,6 +1,5 @@
 _BASE_:
   - ../../coach_pl/configuration/base.yaml
-  - model/cnn.yaml
 
 CRITERION:
   NAME: ClusteringCriterion

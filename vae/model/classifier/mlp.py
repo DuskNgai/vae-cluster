@@ -15,22 +15,23 @@ class MLPClassifier(Mlp):
     @configurable
     def __init__(
         self,
-        in_features: int,
+        latent_dim: int,
         hidden_features: int,
-        out_features: int,
+        num_classes: int,
     ) -> None:
         super().__init__(
-            in_features=in_features,
+            in_features=latent_dim,
             hidden_features=hidden_features,
-            out_features=out_features,
+            out_features=num_classes,
         )
+        self.num_classes = num_classes
 
     @classmethod
     def from_config(cls, cfg: DictConfig) -> dict[str, Any]:
         return {
-            "in_features": cfg.MODEL.LATENT_DIM,
+            "latent_dim": cfg.MODEL.LATENT_DIM,
             "hidden_features": cfg.MODEL.CLASSIFIER.HIDDEN_DIM,
-            "out_features": cfg.MODEL.CLASSIFIER.NUM_CLASSES,
+            "num_classes": cfg.MODEL.CLASSIFIER.NUM_CLASSES,
         }
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

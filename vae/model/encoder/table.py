@@ -23,7 +23,7 @@ class MeanLogVarTableEncoder(LatentTable):
     @classmethod
     def from_config(cls, cfg: DictConfig) -> dict[str, Any]:
         return {
-            "img_size": cfg.MODEL.IMG_SIZE,
+            "num_latents": cfg.MODEL.NUM_LATENTS,
             "latent_dim": cfg.MODEL.LATENT_DIM,
             "weight_init": cfg.MODEL.WEIGHT_INIT,
         }
